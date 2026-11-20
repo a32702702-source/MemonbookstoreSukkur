@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel | Memon Book Store</title>
+  <link rel="stylesheet" href="css/styles.css?v=202611191956">
+  <style>.adm-main{display:none;}</style>
+</head>
+<body class="adm-body" data-page="admin">
+  <!-- Login Modal (Urdu) -->
+  <div id="login-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;">
+    <div style="background:#fff;padding:20px;border-radius:8px;max-width:300px;width:100%;text-align:center;">
+      <h2 style="margin-bottom:1rem;">منتظم لاگ ان</h2>
+      <input type="text" id="login-username" placeholder="صارف نام" style="width:100%;margin-bottom:0.5rem;padding:0.5rem;" />
+      <input type="password" id="login-password" placeholder="پاس ورڈ" style="width:100%;margin-bottom:1rem;padding:0.5rem;" />
+      <button id="login-submit" style="padding:0.5rem 1rem;">داخل کریں</button>
+    </div>
+  </div>
+  <header class="adm-top">
+    <h1>منتظم پینل</h1>
+  </header>
+  <main class="adm-main">
+    <section id="change-password-section">
+  <h2>پاس ورڈ تبدیل کریں</h2>
+  <form id="change-password-form">
+    <div>
+      <label for="current-password">موجودہ پاس ورڈ</label><br/>
+      <input type="password" id="current-password" required />
+    </div>
+    <div>
+      <label for="new-password">نیا پاس ورڈ</label><br/>
+      <input type="password" id="new-password" required />
+    </div>
+    <div>
+      <label for="confirm-password">پاس ورڈ کی تصدیق</label><br/>
+      <input type="password" id="confirm-password" required />
+    </div>
+    <button type="submit" style="margin-top:0.5rem;">اپ ڈیٹ کریں</button>
+  </form>
+  <p id="pw-message" style="color:green;margin-top:0.5rem;display:none;"></p>
+</section>
+
+<script>
+// Login handling
+(function(){
+  const modal = document.getElementById('login-modal');
+  const usernameInput = document.getElementById('login-username');
+  const passwordInput = document.getElementById('login-password');
+  const submitBtn = document.getElementById('login-submit');
+  const storedKey = 'adminPassword';
+  const defaultUser = 'Abdullahtariq';
+  const defaultPass = 'moosa123';
+  // Initialize stored password if not present
+  if(!localStorage.getItem(storedKey)){
+    localStorage.setItem(storedKey, defaultPass);
+  }
+  function hideModal(){ modal.style.display='none'; }
+  submitBtn.addEventListener('click',()=>{
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value;
+    if(user===defaultUser && pass===localStorage.getItem(storedKey)){
+      hideModal();
+    } else {
+      alert('غلط صارف نام یا پاس ورڈ');
+    }
+  });
+})();
+
+// Change password handling
+(function(){
+  const form = document.getElementById('change-password-form');
+  const message = document.getElementById('pw-message');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const current = document.getElementById('current-password').value;
+    const newPass = document.getElementById('new-password').value;
+    const confirm = document.getElementById('confirm-password').value;
+    const stored = localStorage.getItem('adminPassword');
+    if(current!==stored){
+      alert('موجودہ پاس ورڈ غلط ہے');
+      return;
+    }
+    if(newPass!==confirm){
+      alert('نیا پاس ورڈ اور تصدیقی پاس ورڈ مماثل نہیں ہیں');
+      return;
+    }
+    localStorage.setItem('adminPassword', newPass);
+    message.textContent='پاس ورڈ کامیابی سے اپ ڈیٹ ہو گیا ہے';
+    message.style.display='block';
+    form.reset();
+  });
+})();
+</script>
+      <h2>کیٹلاگ</h2>
+      <table id="catalogue-table" border="1" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr><th>Title</th><th>Publisher</th><th>Class</th><th>Price</th></tr>
+        </thead>
+        <tbody>
+          <!-- rows will be injected by script -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script>
+    // Simple script to load catalogue.json and render a table
+    fetch('data/catalogue.json')
+      .then(r => r.json())
+      .then(data => {
+        const tbody = document.querySelector('#catalogue-table tbody');
+        data.items?.forEach(item => {
+          const tr = document.createElement('tr');
+          const title = document.createElement('td');
+          title.textContent = item.title || '';
+          const publisher = document.createElement('td');
+          publisher.textContent = item.publisher || '';
+          const cls = document.createElement('td');
+          cls.textContent = item.class || '';
+          const price = document.createElement('td');
+          price.textContent = item.price ? 'Rs ' + item.price : '';
+          tr.append(title, publisher, cls, price);
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        console.error('Failed to load catalogue', err);
+        const section = document.getElementById('catalogue-section');
+        section.innerHTML = '<p>Error loading catalogue data.</p>';
+      });
+  </script>
+</body>
+</html>
