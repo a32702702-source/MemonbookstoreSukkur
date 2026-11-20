@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+Disallow: /login.html
+
+Sitemap: https://memonbookstore.example/sitemap.xml
